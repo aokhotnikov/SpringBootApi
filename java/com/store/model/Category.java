@@ -1,5 +1,7 @@
 package com.store.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import javax.persistence.*;
 import java.util.List;
 
@@ -57,6 +59,7 @@ public class Category {
 
 
     @ManyToMany
+    @JsonBackReference
     @JoinTable(name = "category_tovar",
             joinColumns = @JoinColumn(name = "cat_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "tovar_id", referencedColumnName = "id")
@@ -73,6 +76,7 @@ public class Category {
 
 
     @ManyToMany
+    @JsonBackReference
     @JoinTable(name = "category_characters",
             joinColumns = @JoinColumn(name = "cat_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "char_id", referencedColumnName = "id")
