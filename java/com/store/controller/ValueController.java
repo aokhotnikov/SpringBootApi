@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 public class ValueController {
@@ -57,7 +58,7 @@ public class ValueController {
 
     //------------------GET TOVARS BY VALUE----------------------
     @GetMapping(value = "/value/{val_id}/tovars")
-    public List<Tovar> getTovars(@PathVariable long val_id){
+    public Set<Tovar> getTovars(@PathVariable long val_id){
 
         if (val_id > 0) {
             Value value = repository.findOne(val_id);

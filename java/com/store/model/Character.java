@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import javax.persistence.*;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "characters")
@@ -56,13 +57,13 @@ public class Character {
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "character")
     @JsonBackReference
-    private List<Value> values;
+    private Set<Value> values;
 
-    public List<Value> getValues() {
+    public Set<Value> getValues() {
         return values;
     }
 
-    public void setValues(List<Value> values) {
+    public void setValues(Set<Value> values) {
         this.values = values;
     }
 }

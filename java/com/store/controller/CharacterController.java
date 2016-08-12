@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 public class CharacterController {
@@ -55,14 +56,14 @@ public class CharacterController {
     }
 
     //------------------GET VALUES BY CHARACTER----------------------
-//    @GetMapping(value = "/character/{char_id}/values")
-//    public List<Value> getValues(@PathVariable long char_id) {
-//        if (char_id > 0) {
-//            Character character = repository.findOne(char_id);
-//            return character.getValues();
-//        }
-//        return null;
-//    }
+    @GetMapping(value = "/character/{char_id}/values")
+    public Set<Value> getValues(@PathVariable long char_id) {
+        if (char_id > 0) {
+            Character character = repository.findOne(char_id);
+            return character.getValues();
+        }
+        return null;
+    }
 
     //------------------GET ALL CHARACTERS----------------------
     @GetMapping(value = "/characters")

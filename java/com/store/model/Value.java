@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import javax.persistence.*;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "values_characters")
@@ -22,7 +23,7 @@ public class Value {
         this.char_id = char_id;
     }
 
-    public Value(String name, long char_id, List<Tovar> tovars) {
+    public Value(String name, long char_id, Set<Tovar> tovars) {
         this.name = name;
         this.char_id = char_id;
         this.tovars = tovars;
@@ -59,13 +60,13 @@ public class Value {
 
     @ManyToMany(fetch = FetchType.EAGER, mappedBy = "values")
     @JsonBackReference
-    private List<Tovar> tovars;
+    private Set<Tovar> tovars;
 
-    public List<Tovar> getTovars() {
+    public Set<Tovar> getTovars() {
         return tovars;
     }
 
-    public void setTovars(List<Tovar> tovars) {
+    public void setTovars(Set<Tovar> tovars) {
         this.tovars = tovars;
     }
 
