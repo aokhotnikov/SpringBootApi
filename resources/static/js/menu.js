@@ -98,12 +98,21 @@ $(document).ready(function () {
                             }
                         }
                     }
+                    $(".dropdown").bind('click',function () { //подсветка меню
+                        $(".dropdown").removeClass("active");
+                        $(this).addClass("active");
+                    });
                 }else{
                     alert("NULL");
                 }
             }
         });
     }
+
     drawMenu();
+
+    $(".main").on('click',function () {
+        $("#tovars").html('');
+    });
 
 });
