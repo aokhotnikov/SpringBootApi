@@ -28,6 +28,14 @@ public class Tovar {
         this.garanty = garanty;
     }
 
+    public Tovar(long id, String name, int available, double price, int garanty) {
+        this.id = id;
+        this.name = name;
+        this.available = available;
+        this.price = price;
+        this.garanty = garanty;
+    }
+
     public Tovar(String name, int available, double price, int garanty, List<Category> categories) {
         this.name = name;
         this.available = available;
