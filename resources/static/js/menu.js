@@ -1,4 +1,4 @@
-function getTovarsFromCategory(id) {
+function drawTovarsList(id) {
     $.ajax({
         url: 'http://localhost:8080/category/' + id + '/tovars',
         type: "GET",
@@ -19,20 +19,82 @@ function getTovarsFromCategory(id) {
                         <p><b>Наличие:</b> ${data[i].available ? "ДА" : "НЕТ"}</p>
                         <p><b>Стоимость:</b> ${data[i].price} грн</p>
                         <p><b>Гарантия:</b> ${data[i].garanty} года</p>
-                        <!--<p align="center"><i>характеристики</i></p>-->
                     `);
-                    // data[i].values.forEach(function(item) {
-                    //     $('.tovar').append(`<p><b>${item.character.name}:</b> ${item.name}</p>`);
-                    // });
                 }
-            }else{
+            } else {
                 alert("NULL");
             }
         }
     });
 }
 
+function drawCategoryCharacters(id) {
+    $.ajax({
+        url: 'http://localhost:8080/category/' + id + '/characters',
+        type: "GET",
+        dataType: "json",
+        success: function (response) {
+            if (response) {
+                $("#characters").html(`
+                    <div class="row"><br>
+                        <div class="character"></div>
+                    </div>
+                `);
+                response.forEach(function(item) {
+                    let char_id = item.id;
+                    getCharacterValues(char_id).then(   //Promise
+                        response => {
+                            $('.character').append(`
+                                <div class="col-sm-3">${item.name}:</div>
+                                <div class="col-sm-3">
+                                    <select class="nameChar-${char_id}">
+                                        <option value="all">Все</option>
+                                    </select>
+                                </div>
+                            `);
+                            $('.nameChar-' + char_id).on('change', function () {
+                                alert("Xyu");
+                            });
+                            response.forEach(function (item) {
+                                $('.nameChar-' + char_id).append(`<option value="${item.id}">${item.name}</option>`);
+                            });
+                        },
+                        error => alert(`Ошибка: ${error}`)
+                    );
+                });
+            }else {
+                alert("NULL");
+            }
+        }
+    });
+}
+
+function getCharacterValues(id) {
+    return new Promise(function(resolve, reject) {
+        $.ajax({
+            url: 'http://localhost:8080/character/' + id + '/values',
+            type: "GET",
+            dataType: "json",
+            success: function (response) {
+                response ? resolve(response) : reject(new Error("Network Error"));
+            }
+        });
+    });
+}
+
+
+function getTovarsFromCategory(id) {
+
+    //get characters
+    drawCategoryCharacters(id);
+
+    //get tovars
+    drawTovarsList(id);
+
+}
+
 function getTovar(id) {
+    $("#characters").html('');
     $.ajax({
         url: 'http://localhost:8080/tovar/' + id,
         type: "GET",
@@ -46,20 +108,20 @@ function getTovar(id) {
                 `);
                 data = response;
 
-                    let tovar = "tovar" + data.id;
-                    $('.tovar').append(`
-                        <hr>
-                        <a onclick="getTovar(${data.id})" href="#"><h3>${data.name}</h3></a>
-                        <p><b>Наличие:</b> ${data.available ? "ДА" : "НЕТ"}</p>
-                        <p><b>Стоимость:</b> ${data.price} грн</p>
-                        <p><b>Гарантия:</b> ${data.garanty} года</p>
-                        <p align="center"><i>характеристики</i></p>
-                    `);
-                    data.values.forEach(function(item) {
-                        $('.tovar').append(`<p><b>${item.character.name}:</b> ${item.name}</p>`);
-                    });
+                let tovar = "tovar" + data.id;
+                $('.tovar').append(`
+                    <hr>
+                    <h3 align="center">${data.name}</h3>
+                    <p><b>Наличие:</b> ${data.available ? "ДА" : "НЕТ"}</p>
+                    <p><b>Стоимость:</b> ${data.price} грн</p>
+                    <p><b>Гарантия:</b> ${data.garanty} года</p>
+                    <p align="center"><i>характеристики</i></p>
+                `);
+                data.values.forEach(function (item) {
+                    $('.tovar').append(`<p><b>${item.character.name}:</b> ${item.name}</p>`);
+                });
 
-            }else{
+            } else {
                 alert("NULL");
             }
         }
@@ -75,7 +137,7 @@ $(document).ready(function () {
             type: "GET",
             dataType: "json",
             success: function (response) {
-                if (response){
+                if (response) {
                     data = response;
                     for (let i = 0; i < data.length; i++) {
 
@@ -91,10 +153,12 @@ $(document).ready(function () {
                             }
                             else{
                                 let parentName = $(parent_li + " a").html();
-                                $(parent_li).html(`<a class="dropdown-toggle" data-toggle="dropdown" href="#">${parentName}<span class="caret"></span></a>
-                                              <ul class="dropdown-menu">
-                                                    ${li}
-                                              </ul>`);
+                                $(parent_li).html(`
+                                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">${parentName}<span class="caret"></span></a>
+                                    <ul class="dropdown-menu">
+                                        ${li}
+                                    </ul>
+                                `);
                             }
                         }
                     }
@@ -102,7 +166,7 @@ $(document).ready(function () {
                         $(".dropdown").removeClass("active");
                         $(this).addClass("active");
                     });
-                }else{
+                } else {
                     alert("NULL");
                 }
             }
@@ -113,6 +177,7 @@ $(document).ready(function () {
 
     $(".main").on('click',function () {
         $("#tovars").html('');
+        $("#characters").html('');
     });
 
 });

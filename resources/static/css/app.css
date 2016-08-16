@@ -3,7 +3,7 @@
 }
 
 body {
-    background: rgba(0, 102, 255, 0.38);
+    background: #76e1fe;
     font-family: sans-serif;
 }
 
@@ -67,7 +67,11 @@ p {
     align-items: center;
 }
 .tovars{
-    width: 600px;
+    width: 800px;
 }
+.characters{
+    width: 800px;
+}
+
 
 
