@@ -1,6 +1,60 @@
-function drawTovarsList(id) {
+function drawCategoryCharacters(id) {
     $.ajax({
-        url: 'http://localhost:8080/category/' + id + '/tovars',
+        url: 'http://localhost:8080/category/' + id + '/characters',
+        type: "GET",
+        dataType: "json",
+        success: function (response) {
+            if (response) {
+                $("#characters").html(`
+                    <div class="row"><br>
+                        <div class="character"></div>
+                        <div><button type="button" onclick="getTovarsByValues(${id});" class="filter btn btn-success">Фильтр</button></div>
+                    </div>
+                `);
+                response.forEach(function(item) {
+                    let char_id = item.id;
+                    getCharacterValues(char_id).then(   //Promise
+                        response => {
+                            $('.character').append(`
+                                <div class="col-sm-3">${item.name}:</div>
+                                <div class="col-sm-3">
+                                    <select class="nameChar-${char_id}">
+                                        <option value="all">Все</option>
+                                    </select>
+                                </div>
+                            `);
+                            response.forEach(function (item) {
+                                $('.nameChar-' + char_id).append(`<option value="${item.id}">${item.name}</option>`);
+                            });
+                        },
+                        error => alert(`Ошибка: ${error}`)
+                    );
+                });
+            }else {
+                alert("NULL");
+            }
+        }
+    });
+}
+
+function getCharacterValues(id) {
+    return new Promise(function(resolve, reject) {
+        $.ajax({
+            url: 'http://localhost:8080/character/' + id + '/values',
+            type: "GET",
+            dataType: "json",
+            success: function (response) {
+                response ? resolve(response) : reject(new Error("Network Error"));
+            }
+        });
+    });
+}
+
+function drawTovarsList(id, values = '') {
+    var characterValues = '';
+    if (values !== '') characterValues = '?values=' + values;
+    $.ajax({
+        url: 'http://localhost:8080/category/' + id + '/tovars' + characterValues,
         type: "GET",
         dataType: "json",
         success: function (response) {
@@ -28,58 +82,21 @@ function drawTovarsList(id) {
     });
 }
 
-function drawCategoryCharacters(id) {
-    $.ajax({
-        url: 'http://localhost:8080/category/' + id + '/characters',
-        type: "GET",
-        dataType: "json",
-        success: function (response) {
-            if (response) {
-                $("#characters").html(`
-                    <div class="row"><br>
-                        <div class="character"></div>
-                    </div>
-                `);
-                response.forEach(function(item) {
-                    let char_id = item.id;
-                    getCharacterValues(char_id).then(   //Promise
-                        response => {
-                            $('.character').append(`
-                                <div class="col-sm-3">${item.name}:</div>
-                                <div class="col-sm-3">
-                                    <select class="nameChar-${char_id}">
-                                        <option value="all">Все</option>
-                                    </select>
-                                </div>
-                            `);
-                            $('.nameChar-' + char_id).on('change', function () {
-                                alert("Xyu");
-                            });
-                            response.forEach(function (item) {
-                                $('.nameChar-' + char_id).append(`<option value="${item.id}">${item.name}</option>`);
-                            });
-                        },
-                        error => alert(`Ошибка: ${error}`)
-                    );
-                });
-            }else {
-                alert("NULL");
+
+function getTovarsByValues(id) {
+    $("#tovars").html('');
+    let values = '';
+    $('select').each(function() {
+        if ($(this).val() !== 'all') {
+            if (values === '')
+                values += $(this).val();
+            else {
+                values += ',' + $(this).val();
             }
         }
     });
-}
 
-function getCharacterValues(id) {
-    return new Promise(function(resolve, reject) {
-        $.ajax({
-            url: 'http://localhost:8080/character/' + id + '/values',
-            type: "GET",
-            dataType: "json",
-            success: function (response) {
-                response ? resolve(response) : reject(new Error("Network Error"));
-            }
-        });
-    });
+    drawTovarsList(id, values);
 }
 
 
