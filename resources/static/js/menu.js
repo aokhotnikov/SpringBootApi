@@ -8,7 +8,7 @@ function drawCategoryCharacters(id) {
                 $("#characters").html(`
                     <div class="row"><br>
                         <div class="character"></div>
-                        <div><button type="button" onclick="getTovarsByValues(${id});" class="filter btn btn-success">Фильтр</button></div>
+                        <div class="col-sm-12 text-center"><button type="button" onclick="getTovarsByValues(${id});" class="filter btn btn-success">Фильтр</button></div>
                     </div>
                 `);
                 response.forEach(function(item) {
