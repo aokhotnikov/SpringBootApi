@@ -1,17 +1,83 @@
+$(document).ready(function () {
+
+    drawMenu();
+
+    $(".main").on('click',function () {
+        $("#tovars").html('');
+        $("#characters").html('');
+    });
+
+});
+
+function drawMenu() {
+    $.ajax({
+        url: 'http://localhost:8080/categories',
+        type: "GET",
+        dataType: "json",
+        success: function (arrayCategories) {
+            if (!arrayCategories) {
+                alert("ARRAY OF CATEGORIES IS NULL");
+            } else {
+                for (let i = 0; i < arrayCategories.length; i++) {
+
+                    let li = `<li id="menu-${arrayCategories[i].id}">
+                                <a href="#" onclick="getTovarsByCategory(${arrayCategories[i].id})">${arrayCategories[i].name}</a>
+                              </li>`;
+                    if (arrayCategories[i].parent_id == 0) {
+                        $(".nav").append(li);
+                    }
+                    else {
+                        let parent_li = "#menu-" + arrayCategories[i].parent_id;
+                        $(parent_li).addClass("dropdown");
+                        if($(parent_li + " a").attr('data-toggle') !== undefined) { //уже есть хотя бы 1 подменю
+                            $(parent_li + " ul").append(li);
+                        }
+                        else{
+                            let parentName = $(parent_li + " a").html();
+                            $(parent_li).html(`
+                                <a class="dropdown-toggle" data-toggle="dropdown" href="#">${parentName}<span class="caret"></span></a>
+                                <ul class="dropdown-menu">
+                                    ${li}
+                                </ul>
+                            `);
+                        }
+                    }
+                }
+                $(".dropdown").bind('click',function () { //подсветка меню
+                    $(".dropdown").removeClass("active");
+                    $(this).addClass("active");
+                });
+            }
+        }
+    });
+}
+
+function getTovarsByCategory(id) {
+
+    //get characters
+    drawCategoryCharacters(id);
+
+    //get tovars
+    drawTovarsList(id);
+
+}
+
 function drawCategoryCharacters(id) {
     $.ajax({
         url: 'http://localhost:8080/category/' + id + '/characters',
         type: "GET",
         dataType: "json",
-        success: function (response) {
-            if (response) {
+        success: function (arrayCharacters) {
+            if (!arrayCharacters) {
+                alert("ARRAY OF CHARACTERS IS NULL");
+            }else {
                 $("#characters").html(`
                     <div class="row"><br>
                         <div class="character"></div>
                         <div class="col-sm-12 text-center"><button type="button" onclick="getTovarsByValues(${id});" class="filter btn btn-success">Фильтр</button></div>
                     </div>
                 `);
-                response.forEach(function(item) {
+                arrayCharacters.forEach(function(item) {
                     let char_id = item.id;
                     getCharacterValues(char_id).then(   //Promise
                         response => {
@@ -30,8 +96,39 @@ function drawCategoryCharacters(id) {
                         error => alert(`Ошибка: ${error}`)
                     );
                 });
-            }else {
-                alert("NULL");
+            }
+        }
+    });
+}
+
+function drawTovarsList(id, values = '') {
+    var characterValues = '';
+    if (values !== '') {
+        characterValues = '?values=' + values;
+    }
+    $.ajax({
+        url: 'http://localhost:8080/category/' + id + '/tovars' + characterValues,
+        type: "GET",
+        dataType: "json",
+        success: function (arrayTovars) {
+            if (!arrayTovars) {
+                alert("ARRAY OF TOVARS IS NULL");
+            } else {
+                $("#tovars").html(`
+                    <div class="row">
+                        <div class="tovar"></div>
+                    </div>
+                `);
+
+                for (let i = 0; i < arrayTovars.length; i++) {
+                    $('.tovar').append(`
+                        <hr>
+                        <a onclick="getTovar(${arrayTovars[i].id})" href="#"><h3>${arrayTovars[i].name}</h3></a>
+                        <p><b>Наличие:</b> ${arrayTovars[i].available ? 'ДА' : 'НЕТ'}</p>
+                        <p><b>Стоимость:</b> ${arrayTovars[i].price} грн</p>
+                        <p><b>Гарантия:</b> ${arrayTovars[i].garanty} года</p>
+                    `);
+                }
             }
         }
     });
@@ -50,41 +147,9 @@ function getCharacterValues(id) {
     });
 }
 
-function drawTovarsList(id, values = '') {
-    var characterValues = '';
-    if (values !== '') characterValues = '?values=' + values;
-    $.ajax({
-        url: 'http://localhost:8080/category/' + id + '/tovars' + characterValues,
-        type: "GET",
-        dataType: "json",
-        success: function (response) {
-            if (response) {
-                $("#tovars").html(`
-                    <div class="row">
-                        <div class="tovar"></div>
-                    </div>
-                `);
-                data = response;
-                for (let i = 0; i < data.length; i++) {
-                    let tovar = "tovar" + data[i].id;
-                    $('.tovar').append(`
-                        <hr>
-                        <a onclick="getTovar(${data[i].id})" href="#"><h3>${data[i].name}</h3></a>
-                        <p><b>Наличие:</b> ${data[i].available ? "ДА" : "НЕТ"}</p>
-                        <p><b>Стоимость:</b> ${data[i].price} грн</p>
-                        <p><b>Гарантия:</b> ${data[i].garanty} года</p>
-                    `);
-                }
-            } else {
-                alert("NULL");
-            }
-        }
-    });
-}
-
-
 function getTovarsByValues(id) {
-    $("#tovars").html('');
+
+    $("#tovars").html('');// clear div
     let values = '';
     $('select').each(function() {
         if ($(this).val() !== 'all') {
@@ -99,102 +164,35 @@ function getTovarsByValues(id) {
     drawTovarsList(id, values);
 }
 
-
-function getTovarsFromCategory(id) {
-
-    //get characters
-    drawCategoryCharacters(id);
-
-    //get tovars
-    drawTovarsList(id);
-
-}
-
 function getTovar(id) {
-    $("#characters").html('');
+    $("#characters").html(''); // clear div
     $.ajax({
         url: 'http://localhost:8080/tovar/' + id,
         type: "GET",
         dataType: "json",
-        success: function (response) {
-            if (response) {
+        success: function (tovar) {
+            if (!tovar) {
+                alert("OBJECT TOVAR IS NULL");
+            } else {
                 $("#tovars").html(`
                     <div class="row">
                         <div class="tovar"></div>
                     </div>
                 `);
-                data = response;
 
-                let tovar = "tovar" + data.id;
                 $('.tovar').append(`
                     <hr>
-                    <h3 align="center">${data.name}</h3>
-                    <p><b>Наличие:</b> ${data.available ? "ДА" : "НЕТ"}</p>
-                    <p><b>Стоимость:</b> ${data.price} грн</p>
-                    <p><b>Гарантия:</b> ${data.garanty} года</p>
+                    <h3 align="center">${tovar.name}</h3>
+                    <p><b>Наличие:</b> ${tovar.available ? "ДА" : "НЕТ"}</p>
+                    <p><b>Стоимость:</b> ${tovar.price} грн</p>
+                    <p><b>Гарантия:</b> ${tovar.garanty} года</p>
                     <p align="center"><i>характеристики</i></p>
                 `);
-                data.values.forEach(function (item) {
+
+                tovar.values.forEach(function (item) {
                     $('.tovar').append(`<p><b>${item.character.name}:</b> ${item.name}</p>`);
                 });
-
-            } else {
-                alert("NULL");
             }
         }
     });
 }
-
-
-$(document).ready(function () {
-
-    function drawMenu() {
-        $.ajax({
-            url: 'http://localhost:8080/categories',
-            type: "GET",
-            dataType: "json",
-            success: function (response) {
-                if (response) {
-                    data = response;
-                    for (let i = 0; i < data.length; i++) {
-
-                        let li = '<li id="menu-' + data[i].id + '"><a href="#" onclick="getTovarsFromCategory(' + data[i].id + ');">' + data[i].name + '</a></li>';
-
-                        if (data[i].parent_id == 0)
-                            $(".nav").append(li);
-                        else {
-                            let parent_li = "#menu-" + data[i].parent_id;
-                            $(parent_li).addClass("dropdown");
-                            if($(parent_li + " a").attr('data-toggle') !== undefined) { //уже есть хотя бы 1 подменю
-                                $(parent_li + " ul").append(li);
-                            }
-                            else{
-                                let parentName = $(parent_li + " a").html();
-                                $(parent_li).html(`
-                                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">${parentName}<span class="caret"></span></a>
-                                    <ul class="dropdown-menu">
-                                        ${li}
-                                    </ul>
-                                `);
-                            }
-                        }
-                    }
-                    $(".dropdown").bind('click',function () { //подсветка меню
-                        $(".dropdown").removeClass("active");
-                        $(this).addClass("active");
-                    });
-                } else {
-                    alert("NULL");
-                }
-            }
-        });
-    }
-
-    drawMenu();
-
-    $(".main").on('click',function () {
-        $("#tovars").html('');
-        $("#characters").html('');
-    });
-
-});
