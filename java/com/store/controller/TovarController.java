@@ -90,13 +90,4 @@ public class TovarController {
     public Iterable<Tovar> getTovars() {
         return repository.findAll();
     }
-
-    //------------------GET TOVARS BY VALUES----------------------
-    @GetMapping(value = "/tovars/value/{valueId}")
-    public Set<Tovar> getTovarsByValue(@PathVariable long valueId) {
-
-        return valueId > 0 ? repository.findByValue(valueId) : null;
-    }
-
 }
-

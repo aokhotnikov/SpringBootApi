@@ -4,13 +4,14 @@ import com.store.model.Category;
 import com.store.model.Character;
 import com.store.model.Tovar;
 import com.store.service.CategoryRepository;
-import java.sql.*;
+
+import javax.annotation.Resource;
 import javax.sql.DataSource;
 
+import com.store.service.TovarRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -18,6 +19,9 @@ public class CategoryController {
 
     @Autowired
     private CategoryRepository repository;
+
+    @Resource(name="tovarRepository")
+    private TovarRepository trepository;
 
     private DataSource dataSource;
 
@@ -71,7 +75,7 @@ public class CategoryController {
 
     //------------------GET TOVARS BY CATEGORY AND VALUES ----------------------
     @GetMapping(value = "/category/{cat_id}/tovars")
-    public List<Tovar> getTovars(@PathVariable long cat_id, String values) {
+    public List<Tovar> getTovars(@PathVariable long cat_id, long[] values) {
         if (cat_id > 0) {
 
             if (values == null) {
@@ -79,45 +83,7 @@ public class CategoryController {
                 return category.getTovars();
             }
 
-            List<Tovar> tovars = new ArrayList<>();
-            String sql = " SELECT t.* from tovar t" +
-                    " left join category_tovar ct on t.id = ct.tovar_id" +
-                    " left join category cat on cat.id = ct.cat_id" +
-                    " left join tovar_characters tc on t.id = tc.tovar_id" +
-                    " left join values_characters vc on vc.id = tc.val_id" +
-                    " where cat.id = ? and vc.id in (" + values + ")" +
-                    " group by t.name" +
-                    " having count(*)=?";
-
-            Connection conn = null;
-            try {
-                conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/market", "root", "fbi");
-                PreparedStatement ps = conn.prepareStatement(sql);
-                ps.setLong(1, cat_id);
-                ps.setLong(2, values.split(",").length);
-                ResultSet rs = ps.executeQuery();
-                while (rs.next()) {
-                    long id = rs.getLong("ID");
-                    String name = rs.getString("NAME");
-                    int available = rs.getInt("AVAILABLE");
-                    double price = rs.getDouble("PRICE");
-                    int garanty = rs.getInt("GARANTY");
-                    Tovar tovar = new Tovar(id, name, available, price, garanty);
-                    tovars.add(tovar);
-                }
-
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            } finally {
-                if (conn != null) {
-                    try {
-                        conn.close();
-                    } catch (SQLException e) {
-                    }
-                }
-            }
-            return tovars;
-
+            return trepository.findByValue(cat_id, values, values.length);
         }
         return null;
     }
