@@ -186,31 +186,57 @@ INSERT INTO `characters` (`id`, `name`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Структура таблицы `owner`
+--
+
+DROP TABLE IF EXISTS `owner`;
+CREATE TABLE IF NOT EXISTS `owner` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `name_UNIQUE` (`name`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
+
+--
+-- Дамп данных таблицы `owner`
+--
+
+INSERT INTO `owner` (`id`, `name`) VALUES
+(1, 'Alex'),
+(3, 'Andrey'),
+(2, 'Ivan');
+
+-- --------------------------------------------------------
+
+--
 -- Структура таблицы `tovar`
 --
 
+DROP TABLE IF EXISTS `tovar`;
 CREATE TABLE IF NOT EXISTS `tovar` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(100) NOT NULL,
   `available` tinyint(1) NOT NULL DEFAULT '1',
   `price` decimal(8,2) NOT NULL,
   `garanty` int(11) NOT NULL,
+  `owner_id` int(11) NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `name_UNIQUE` (`name`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=9 ;
+  UNIQUE KEY `name_UNIQUE` (`name`),
+  KEY `fk1_idx` (`owner_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8;
 
 --
 -- Дамп данных таблицы `tovar`
 --
 
-INSERT INTO `tovar` (`id`, `name`, `available`, `price`, `garanty`) VALUES
-(1, 'HP Stream 11-r001ur (N8J56EA) Purple', 1, 5499.00, 2),
-(2, 'Asus EeeBook E202SA (E202SA-FD0016D) White', 1, 7699.00, 2),
-(3, 'Asus Transformer Book T100HA 64GB Rouge Pink (T100HA-FU011T)', 0, 9500.00, 1),
-(4, 'CANDY CCTOS 502WH ', 1, 3499.00, 3),
-(5, 'ELECTROLUX 1601 AOW3', 1, 4599.00, 3),
-(6, 'Samsung Galaxy J7 J700H/DS Gold', 1, 2999.00, 2),
-(7, 'Lenovo Vibe K5 Plus (A6020a46) Champagne Gold', 1, 6959.00, 0);
+INSERT INTO `tovar` (`id`, `name`, `available`, `price`, `garanty`, `owner_id`) VALUES
+(1, 'HP Stream 11-r001ur (N8J56EA) Purple', 1, '5499.00', 2, 1),
+(2, 'Asus EeeBook E202SA (E202SA-FD0016D) White', 1, '7699.00', 2, 3),
+(3, 'Asus Transformer Book T100HA 64GB Rouge Pink (T100HA-FU011T)', 0, '9500.00', 1, 2),
+(4, 'CANDY CCTOS 502WH ', 1, '3499.00', 3, 2),
+(5, 'ELECTROLUX 1601 AOW3', 1, '4599.00', 3, 1),
+(6, 'Samsung Galaxy J7 J700H/DS Gold', 1, '2999.00', 2, 3),
+(7, 'Lenovo Vibe K5 Plus (A6020a46) Champagne Gold', 1, '6959.00', 0, 1);
 
 -- --------------------------------------------------------
 

@@ -1,6 +1,7 @@
 package com.store.controller;
 
 import com.store.model.Category;
+import com.store.model.Owner;
 import com.store.model.Tovar;
 import com.store.model.Value;
 import com.store.service.TovarRepository;
@@ -8,7 +9,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.List;
-import java.util.Set;
 
 @RestController
 public class TovarController {
@@ -33,9 +33,10 @@ public class TovarController {
     @PostMapping(value = "/tovar")
     public void postTovar(String name, int available,
                           @RequestParam(value="price", defaultValue = "0") double price,
-                          @RequestParam(value="garanty",defaultValue = "0") int garanty) {
+                          @RequestParam(value="garanty",defaultValue = "0") int garanty,
+                          long owner_id) {
 
-        Tovar tovar = new Tovar(name,available,price,garanty);
+        Tovar tovar = new Tovar(name,available,price,garanty,owner_id);
         repository.save(tovar);
     }
 
@@ -89,5 +90,16 @@ public class TovarController {
     @GetMapping(value = "/tovars")
     public Iterable<Tovar> getTovars() {
         return repository.findAll();
+    }
+
+    //------------------GET TOVAR'S OWNER----------------------
+    @GetMapping(value = "/tovar/{tovarId}/owner")
+    public Owner getOwner(@PathVariable long tovarId) {
+
+        if (tovarId > 0) {
+            Tovar tovar = repository.findOne(tovarId);
+            return tovar.getOwner();
+        }
+        return null;
     }
 }
