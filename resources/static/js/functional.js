@@ -4,7 +4,7 @@ $(document).ready(function () {
 
     $(".main").on('click',function () {
         $("#tovars").html('');
-        $("#characters").html('');
+        $(".characters").html('');
     });
 
 });
@@ -71,21 +71,21 @@ function drawCategoryCharacters(id) {
             if (!arrayCharacters) {
                 alert("ARRAY OF CHARACTERS IS NULL");
             }else {
-                $("#characters").html(`
-                    <div class="row"><br>
-                        <div class="character"></div>
-                        <div class="col-sm-12 text-center"><button type="button" onclick="getTovarsByValues(${id});" class="filter btn btn-success">Фильтр</button></div>
+                $(".characters").html(`
+                    <div id="characters"></div>
+                    <div class="filter">
+                        <button type="button" onclick="getTovarsByValues(${id});" class="filter btn btn-success">Фильтр</button>
                     </div>
                 `);
                 arrayCharacters.forEach(function(item) {
                     let char_id = item.id;
                     getCharacterValues(char_id).then(   //Promise
                         response => {
-                            $('.character').append(`
-                                <div class="col-sm-3">${item.name}:</div>
-                                <div class="col-sm-3">
+                            $('#characters').append(`
+                                <div>${item.name}:</div>
+                                <div>
                                     <select class="nameChar-${char_id}">
-                                        <option value="all">Все</option>
+                                        <option value="all">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</option>
                                     </select>
                                 </div>
                             `);
@@ -96,7 +96,7 @@ function drawCategoryCharacters(id) {
                         error => alert(`Ошибка: ${error}`)
                     );
                 });
-            }
+             }
         }
     });
 }
@@ -114,19 +114,14 @@ function drawTovarsList(id, values = '') {
             if (!arrayTovars) {
                 alert("ARRAY OF TOVARS IS NULL");
             } else {
-                $("#tovars").html(`
-                    <div class="row">
-                        <div class="tovar"></div>
-                    </div>
-                `);
-
+                $('#tovars').html('');
                 for (let i = 0; i < arrayTovars.length; i++) {
-                    $('.tovar').append(`
-                        <hr>
+                    $('#tovars').append(`
                         <a onclick="getTovar(${arrayTovars[i].id})" href="#"><h3>${arrayTovars[i].name}</h3></a>
                         <p><b>Наличие:</b> ${arrayTovars[i].available ? 'ДА' : 'НЕТ'}</p>
                         <p><b>Стоимость:</b> ${arrayTovars[i].price} грн</p>
                         <p><b>Гарантия:</b> ${arrayTovars[i].garanty} года</p>
+                        <hr>
                     `);
                 }
             }
@@ -165,7 +160,7 @@ function getTovarsByValues(id) {
 }
 
 function getTovar(id) {
-    $("#characters").html(''); // clear div
+    //$(".characters").html(''); // clear div
     $.ajax({
         url: 'http://localhost:8080/tovar/' + id,
         type: "GET",
@@ -174,23 +169,19 @@ function getTovar(id) {
             if (!tovar) {
                 alert("OBJECT TOVAR IS NULL");
             } else {
-                $("#tovars").html(`
-                    <div class="row">
-                        <div class="tovar"></div>
-                    </div>
-                `);
-
-                $('.tovar').append(`
-                    <hr>
+                $('#tovars').html(`
                     <h3 align="center">${tovar.name}</h3>
                     <p><b>Наличие:</b> ${tovar.available ? "ДА" : "НЕТ"}</p>
                     <p><b>Стоимость:</b> ${tovar.price} грн</p>
                     <p><b>Гарантия:</b> ${tovar.garanty} года</p>
+                    <p><i>Ответственный:</i> ${tovar.owner.name}</p>
                     <p align="center"><i>характеристики</i></p>
                 `);
 
                 tovar.values.forEach(function (item) {
-                    $('.tovar').append(`<p><b>${item.character.name}:</b> ${item.name}</p>`);
+                    $('#tovars').append(`
+                        <p><b>${item.character.name}:</b> ${item.name}</p>
+                    `);
                 });
             }
         }
