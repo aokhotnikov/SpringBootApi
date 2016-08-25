@@ -23,7 +23,6 @@ public class CategoryController {
     @Resource(name="tovarRepository")
     private TovarRepository trepository;
 
-    private DataSource dataSource;
 
     //------------------GET----------------------
     @GetMapping(value = "/category/{cat_id}")
