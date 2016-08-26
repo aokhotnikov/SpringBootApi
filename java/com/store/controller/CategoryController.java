@@ -6,7 +6,6 @@ import com.store.model.Tovar;
 import com.store.service.CategoryRepository;
 
 import javax.annotation.Resource;
-import javax.sql.DataSource;
 
 import com.store.service.TovarRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +23,12 @@ public class CategoryController {
     private TovarRepository trepository;
 
 
-    //------------------GET----------------------
+
+    /**------------------------GET-------------------------
+     * The method returns an object "Category" for the requested field "id"
+     * @param cat_id
+     * @return "Category" object
+     */
     @GetMapping(value = "/category/{cat_id}")
     public Category getCategory(@PathVariable long cat_id){
         if (cat_id > 0) {
@@ -34,7 +38,11 @@ public class CategoryController {
         return null;
     }
 
-    //------------------POST----------------------
+    /**------------------------POST-------------------------
+     * The method creates a new category
+     * @param name
+     * @param parent_id
+     */
     @PostMapping(value = "/category")
     public void postCategory(String name, @RequestParam(value="parent_id", defaultValue = "0") long parent_id) {
 
@@ -42,7 +50,12 @@ public class CategoryController {
         repository.save(category);
     }
 
-    //------------------PUT----------------------
+    /**--------------------------PUT------------------------
+     * The method editing category
+     * @param cat_id
+     * @param name
+     * @param parent_id
+     */
     @PutMapping(value = "/category/{cat_id}")
     public void putCategory(@PathVariable long cat_id, String name, long parent_id) {
 
@@ -52,7 +65,11 @@ public class CategoryController {
         repository.save(category);
     }
 
-    //------------------DELETE----------------------
+    /**-----------------------DELETE------------------------
+     * The method removes the category
+     * @param cat_id
+     * @return true or false
+     */
     @DeleteMapping(value = "/category/{cat_id}")
     public boolean delCategory(@PathVariable long cat_id) {
 
@@ -66,13 +83,22 @@ public class CategoryController {
 
 
 
-    //------------------GET ALL CATEGORIES----------------------
+    /**------------------GET ALL CATEGORIES----------------------
+     * The method returns all categories
+     * @return An iterator of objects "Category"
+     */
     @GetMapping(value = "/categories")
     public Iterable<Category> getCaregories() {
         return repository.findAll();
     }
 
-    //------------------GET TOVARS BY CATEGORY AND VALUES ----------------------
+
+    /**-----------GET TOVARS BY CATEGORY AND VALUES -------------
+     * The method returns the tovars for a given category and entered the characteristics values
+     * @param cat_id
+     * @param values
+     * @return List of objects "Tovar" or null
+     */
     @GetMapping(value = "/category/{cat_id}/tovars")
     public List<Tovar> getTovars(@PathVariable long cat_id, long[] values) {
         if (cat_id > 0) {
@@ -87,7 +113,11 @@ public class CategoryController {
         return null;
     }
 
-    //------------------GET CHARACTERS BY CATEGORY----------------------
+    /**------------------GET CHARACTERS BY CATEGORY----------------------
+     * The method returns the characteristics of the category
+     * @param cat_id
+     * @return List of objects "Character" or null
+     */
     @GetMapping(value = "/category/{cat_id}/characters")
     public List<Character> getCharacters(@PathVariable long cat_id) {
         if (cat_id > 0) {
