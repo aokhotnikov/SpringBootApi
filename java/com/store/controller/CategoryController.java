@@ -87,6 +87,7 @@ public class CategoryController {
      * The method returns all categories
      * @return An iterator of objects "Category"
      */
+    @CrossOrigin(origins = "http://reactjs.dev")
     @GetMapping(value = "/categories")
     public Iterable<Category> getCaregories() {
         return repository.findAll();
